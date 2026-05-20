@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      API_KEY: ${API_KEY:-dev-key-change-me}
+      FMCSA_WEB_KEY: ${FMCSA_WEB_KEY:-}
+      DATABASE_URL: sqlite:////data/app.db
+    volumes:
+      - api-data:/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    environment:
+      API_BASE_URL: http://api:8000
+      API_KEY: ${API_KEY:-dev-key-change-me}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
+
+volumes:
+  api-data:

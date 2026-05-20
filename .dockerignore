@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.env
+.venv/
+venv/
+*.db
+*.sqlite*
+README.md
+*.md
+.idea/
+.vscode/

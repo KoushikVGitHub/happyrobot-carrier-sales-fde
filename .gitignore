@@ -1,0 +1,30 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+*.db
+*.sqlite
+*.sqlite3
+.DS_Store
+.idea/
+.vscode/
+*.log
+dist/
+build/
+*.egg-info/
+.streamlit/secrets.toml
+
+# Secrets / private files (DO NOT COMMIT)
+FMCSA API KEY.txt
+*.key
+*.pem
+secrets.txt
+notes.txt
+
+# Take-home spec PDF (HappyRobot proprietary, do not redistribute)
+FDE_20Technical_20Challenge_20-_20Inbound_20Carrier_20Sales.pdf
+
+# Claude Code / IDE local settings
+.claude/

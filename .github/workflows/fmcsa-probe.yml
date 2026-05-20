@@ -1,0 +1,37 @@
+name: fmcsa-probe
+# Manually-triggered probe to verify the FMCSA QCMobile API key from a US-egress GitHub runner.
+# The FMCSA WAF blocks non-US IPs with 403, so we can't test from outside the US directly.
+# Set `FMCSA_KEY` as a repository secret before running. Trigger from the Actions tab → "Run workflow".
+
+on:
+  workflow_dispatch:
+    inputs:
+      mc_numbers:
+        description: "Space-separated MC numbers to probe"
+        required: false
+        default: "44110 105560 123456"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe FMCSA QCMobile
+        env:
+          FMCSA_KEY: ${{ secrets.FMCSA_KEY }}
+          MCS: ${{ github.event.inputs.mc_numbers }}
+        run: |
+          if [ -z "$FMCSA_KEY" ]; then
+            echo "::error::Repo secret FMCSA_KEY is not set."
+            exit 1
+          fi
+          for MC in $MCS; do
+            echo "===================="
+            echo "MC: $MC"
+            echo "===================="
+            curl -sS -o /tmp/body -w "HTTP %{http_code}  time=%{time_total}s\n" \
+              "https://mobile.fmcsa.dot.gov/qc/services/carriers/docket-number/${MC}?webKey=${FMCSA_KEY}"
+            echo "--- first 600 bytes of body ---"
+            head -c 600 /tmp/body || true
+            echo
+            echo
+          done
